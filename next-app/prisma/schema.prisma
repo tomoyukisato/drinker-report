@@ -1,0 +1,39 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Drink {
+  id           Int           @id @default(autoincrement())
+  name         String
+  perOneMl     Int
+  type         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  DrinkReports DrinkReport[]
+}
+
+model DrinkReport {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  drinkId   Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User?    @relation(fields: [userId], references: [id])
+  drink     Drink?   @relation(fields: [drinkId], references: [id])
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String?
+  email        String?       @unique
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  DrinkReports DrinkReport[]
+}
